@@ -1,5 +1,7 @@
 const express = require('express')
-const mongoose = require('mongodb')
+const mongoose = require('mongoose') 
+const bodyParser = require('body-parser')
+
 
 
 //Routes api
@@ -7,15 +9,23 @@ const users = require('./routes/api/users')
 const profiles = require('./routes/api/profiles')
 const posts = require('./routes/api/posts')
 
+
+
+const app = express()
+
+//bodyParser
+
+app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.json())
+
 const db  = require('./config/keys').mogooseUrl
 //Connexion 
 mongoose
-    .connect(db,{useNewUrlParser: true, useUnifiedTopology: true})
+    .connect(db,{ useUnifiedTopology: true, useNewUrlParser: true })
     .then(data=>console.log(`Connected MongoDB: ${db}`))
     .catch( error=> console.log(error))
 
 
-const app = express()
 
 app.get('/',(req,res)=>res.send('Salut les mies!'))
 

@@ -1,3 +1,4 @@
 module.exports ={
-    mogooseUrl: 'mongodb://127.0.0.1:27017/db-social'
+    mogooseUrl:  process.env.MONGO_HOST || 'mongodb://' + (process.env.IP || 'localhost') + ':' + (process.env.MONGO_PORT || '27017') + '/damsocial'
+
 }
