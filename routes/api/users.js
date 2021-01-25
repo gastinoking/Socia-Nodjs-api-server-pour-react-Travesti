@@ -4,6 +4,8 @@ const User = require("../../models/User");
 const gravatar = require("gravatar");
 const pasport = require("passport");
 
+const validateRegisterInput = require("../../validation/register");
+
 const bcrypt = require("bcryptjs");
 const key = require("../../config/keys");
 const jwt = require("jsonwebtoken");
@@ -23,10 +25,17 @@ router.get("/test", (req, res) =>
  * @access Public
  */
 router.post("/register", async (req, res) => {
+  const { errors, isValide } = validateRegisterInput(req.body);
+  //Check validation
+
+  if (!isValide) {
+    return res.status(200).json(errors);
+  }
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
-      res.status(400).json({ email: "le Email est déja urilisé !" });
+      errors.email = "le Email est déja urilisé !";
+      res.status(400).json(errors);
     } else {
       const avatar = gravatar.url(req.body.name, {
         s: "200", //SIze
@@ -113,12 +122,16 @@ router.post("/login", async (req, res) => {
  * @access Private
  */
 
-router.get("/current", pasport.authenticate("jwt", { session: false }), (req, res) => {
+router.get(
+  "/current",
+  pasport.authenticate("jwt", { session: false }),
+  (req, res) => {
     res.json({
-        id:req.user.id,
-        email:req.user.email,
-        name:req.user.name,
-    })
-});
+      id: req.user.id,
+      email: req.user.email,
+      name: req.user.name,
+    });
+  }
+);
 
 module.exports = router;
