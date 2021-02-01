@@ -5,6 +5,7 @@ const gravatar = require("gravatar");
 const pasport = require("passport");
 
 const validateRegisterInput = require("../../validation/register");
+const validateLoginInput = require("../../validation/login");
 
 const bcrypt = require("bcryptjs");
 const key = require("../../config/keys");
@@ -35,9 +36,9 @@ router.post("/register", async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
       errors.email = "le Email est déja urilisé !";
-      res.status(400).json(errors);
+      return res.status(400).json(errors);
     } else {
-      const avatar = gravatar.url(req.body.name, {
+      const avatar = gravatar.url(req.body.email, {
         s: "200", //SIze
         r: "pg", //Rating
         d: "mm", //defaulte
@@ -71,15 +72,18 @@ router.post("/register", async (req, res) => {
  * @access Public
  */
 router.post("/login", async (req, res) => {
+  const { errors, isValide } = validateLoginInput(req.body);
+
+  if (!isValide) {
+    return res.status(200).json(errors);
+  }
   const email = req.body.email;
   const password = req.body.password;
   try {
     const user = await User.findOne({ email });
-
     if (!user) {
-      return res
-        .status(404)
-        .json({ email: " Aucun utilisateur ne correspond à ce email" });
+      errors.email = " Aucun utilisateur ne correspond à ce email";
+      return res.status(404).json(errors);
     }
 
     try {
@@ -104,9 +108,8 @@ router.post("/login", async (req, res) => {
           }
         );
       } else {
-        return res
-          .status(400)
-          .json({ password: "Login ou mot de pass invalide" });
+        errors.password = "Login ou mot de pass invalide";
+        return res.status(400).json(errors);
       }
     } catch (error) {
       console.log(error);
