@@ -28,6 +28,7 @@ router.get(
   (req, res) => {
     const errors = {};
     Profile.findOne({ user: req.user.id })
+      .populate("user", ["name", "avatar"])
       .then((profile) => {
         if (!profile) {
           errors.noprofile = "Pas encore de profile pour cet utilisateur !";
@@ -38,6 +39,76 @@ router.get(
       .catch((err) => res.status(404).json());
   }
 );
+
+/**
+ * @route GET api/profile/handle/handle
+ * @desc get user profil by handle
+ * @access Public
+ */
+
+router.get("/handle/:handle", async (req, res) => {
+  const errors = {};
+  try {
+    const profile = await Profile.findOne({
+      handle: req.params.handle,
+    }).populate("user", ["name", "avatar"]);
+    if (!profile) {
+      errors.noprofile = "Aucun profile ne correspond à : " + req.params.handle;
+      return res.json(errors);
+    }
+    return res.status(404).json(profile);
+  } catch (e) {
+    errors.noprofile = "Un problème est survenu : ";
+    errors.errors = e.toString();
+    return res.status(404).json(errors);
+  }
+});
+
+/**
+ * @route GET api/profile/user/user_id
+ * @desc get user profil by user_id
+ * @access Public
+ */
+
+router.get("/user/:user_id", async (req, res) => {
+  const errors = {};
+  try {
+    const profile = await Profile.findOne({
+      user: req.params.user_id,
+    }).populate("user", ["name", "avatar"]);
+    if (!profile) {
+      errors.noprofile =
+        "Aucun profile ne correspond à : " + req.params.user_id;
+      return res.status(404).json(errors);
+    }
+    return res.json(profile);
+  } catch (e) {
+    errors.noprofile = "Un problème est survenu : ";
+    errors.errors = e.toString();
+    return res.status(404).json(errors);
+  }
+});
+
+/**
+ * @route GET api/profile/all
+ * @desc get all profil
+ * @access Public
+ */
+router.get("/all", async (req, res) => {
+  const errors = {};
+  try {
+    const profiles = await Profile.find().populate("user", ["name", "avatar"]);
+    if (!profiles) {
+      errors.noprofile = "Aucun profile trouvé";
+      return res.status(404).json(errors);
+    }
+    return res.json(profiles);
+  } catch (e) {
+    errors.noprofile = "Un problème est survenu : ";
+    errors.errors = e.toString();
+    return res.status(404).json(errors);
+  }
+});
 
 /**
  * @route POST api/profile
@@ -57,7 +128,7 @@ router.post(
     //Get fields
     const profileFields = {};
 
-    profileFields.user = req.body.user;
+    profileFields.user = req.user.id;
     if (req.body.handle) profileFields.handle = req.body.handle;
     if (req.body.company) profileFields.company = req.body.company;
     if (req.body.website) profileFields.website = req.body.website;
@@ -68,7 +139,7 @@ router.post(
       profileFields.githubusername = req.body.githubusername;
 
     //Split in to Array
-    if (typeof req.body.skills !== undefined) {
+    if (typeof req.body.skills !== "undefined") {
       profileFields.skills = req.body.skills.split(",");
     }
     // /Social
@@ -92,8 +163,9 @@ router.post(
         ).then((profile) => res.json(profile));
       } else {
         //Create
+
         // Check if handle exixt
-        Profile.findOne({ handle: req.body.handle }).then((profile) => {
+        Profile.findOne({ handle: profileFields.handle }).then((profile) => {
           if (profile) {
             errors.handle = " handle existe déja !";
             res.status(400).json(errors);
