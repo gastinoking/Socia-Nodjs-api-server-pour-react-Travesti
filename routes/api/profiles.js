@@ -3,10 +3,13 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const passport = require("passport");
 
+// User model
 const User = require("../../models/User");
 const Profile = require("../../models/Profile");
 
 const validateProfileInput = require("../../validation/profile");
+const validateExperienceInput = require("../../validation/experience");
+const validateEducationeInput = require("../../validation/education");
 
 /**
  * @route GET api/profile/test
@@ -177,6 +180,179 @@ router.post(
         });
       }
     });
+  }
+);
+
+/**
+ * @route POST api/profile/experience
+ * @desc SAVE user profil experience
+ * @access Private
+ */
+router.post(
+  "/experience",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const { errors, isValide } = validateExperienceInput(req.body);
+
+    // Check Errors
+    if (!isValide) {
+      return res.status(401).json(errors);
+    }
+
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+      const newExp = {
+        title: req.body.title,
+        company: req.body.company,
+        location: req.body.location,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description,
+      };
+
+      profile.experience.unshift(newExp);
+
+      try {
+        const saveProfile = await profile.save();
+        res.json(saveProfile);
+      } catch (error) {
+        res.status(422).json(error);
+      }
+    } catch (error) {
+      res.status(422).json(error);
+    }
+  }
+);
+
+/**
+ * @route POST api/profile/education
+ * @desc SAVE user profil education
+ * @access Private
+ */
+router.post(
+  "/education",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const { errors, isValide } = validateEducationeInput(req.body);
+
+    // Check Errors
+    if (!isValide) {
+      return res.status(401).json(errors);
+    }
+
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+      const newEdu = {
+        school: req.body.school,
+        degree: req.body.degree,
+        fieldofstudy: req.body.fieldofstudy,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description,
+      };
+
+      profile.education.unshift(newEdu);
+
+      try {
+        const saveProfile = await profile.save();
+        res.json(saveProfile);
+      } catch (error) {
+        res.status(422).json(error);
+      }
+    } catch (error) {
+      res.status(422).json(error);
+    }
+  }
+);
+
+/**
+ * @route DELETE api/profile/experience/exp_id
+ * @desc DELETE user profil experience
+ * @access Private
+ */
+router.delete(
+  "/experience/:exp_id",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+
+      const removeIndex = profile.experience
+        .map((item) => item.id)
+        .indexOf(req.params.exp_id);
+
+      profile.experience.splice(removeIndex, 1);
+      console.log(removeIndex);
+
+      try {
+        const saveProfile = await profile.save();
+        res.json(saveProfile);
+      } catch (error) {
+        res.status(422).json(error);
+      }
+    } catch (error) {
+      res.status(422).json(error);
+    }
+  }
+);
+
+/**
+ * @route DELETE api/profile/education/edu_id
+ * @desc DELETE user profil education
+ * @access Private
+ */
+router.delete(
+  "/education/:edu_id",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    errors = {};
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+
+      const removeIndex = profile.education
+        .map((item) => item.id)
+        .indexOf(req.params.edu_id);
+
+      profile.education.splice(removeIndex, 1);
+      if (removeIndex === -1) {
+        errors.message = "L'education d'existe pas !";
+        return res.status(404).json(errors);
+      }
+      try {
+        const saveProfile = await profile.save();
+        res.json(saveProfile);
+      } catch (error) {
+        res.status(422).json(error);
+      }
+    } catch (error) {
+      res.status(422).json(error);
+    }
+  }
+);
+
+/**
+ * @route DELETE api/profile/
+ * @desc DELETE user and profil
+ * @access Private
+ */
+router.delete(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const profile = await Profile.findOneAndRemove({ user: req.user.id });
+
+      try {
+        const saveProfile = await User.findByIdAndRemove({ _id: req.user.id });
+        res.json({ succes: true });
+      } catch (error) {
+        res.status(422).json(error);
+      }
+    } catch (error) {
+      res.status(422).json(error);
+    }
   }
 );
 

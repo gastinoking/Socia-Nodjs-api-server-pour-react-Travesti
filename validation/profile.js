@@ -31,29 +31,29 @@ module.exports = function validateProfileInput(data) {
 
   if (!Validator.isEmpty(data.website)) {
     if (!Validator.isURL(data.website)) {
-      errors.website = "Le champs website n'est pas valide  !";
+      errors.website = "Le champs website n'est pas valide !";
     }
   }
 
   if (!Validator.isEmpty(data.youtube)) {
     if (!Validator.isURL(data.youtube)) {
-      errors.youtube = "Le champs youtube n'est pas valide  !";
+      errors.youtube = "Le champs youtube n'est pas valide !";
     }
   }
 
   if (!Validator.isEmpty(data.twitter)) {
     if (!Validator.isURL(data.twitter)) {
-      errors.twitter = "Le champs twitter n'est pas valide  !";
+      errors.twitter = "Le champs twitter n'est pas valide !";
     }
   }
   if (!Validator.isEmpty(data.linkedin)) {
     if (!Validator.isURL(data.linkedin)) {
-      errors.linkedin = "Le champs linkedin n'est pas valide  !";
+      errors.linkedin = "Le champs linkedin n'est pas valide !";
     }
   }
   if (!Validator.isEmpty(data.instagram)) {
     if (!Validator.isURL(data.instagram)) {
-      errors.instagram = "Le champs instagram n'est pas valide  !";
+      errors.instagram = "Le champs instagram n'est pas valide !";
     }
   }
 
