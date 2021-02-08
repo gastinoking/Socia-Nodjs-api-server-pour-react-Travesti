@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
   //Check validation
 
   if (!isValide) {
-    return res.status(200).json(errors);
+    return res.status(422).json(errors);
   }
   try {
     const user = await User.findOne({ email: req.body.email });

@@ -5,19 +5,23 @@ import Navbar from "./components/Navbar";
 import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
+import { Provider } from "react-redux";
+import store from "./Redux/store";
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Navbar />
-        <Route path="/" exact component={Landing} />
-        <div className="container">
-          <Route exact path="/register" component={Register} />
-          <Route exact path="/login" component={Login} />
+    <Provider store={store}>
+      <Router>
+        <div className="App">
+          <Navbar />
+          <Route path="/" exact component={Landing} />
+          <div className="container" style={{ height: "100vh" }}>
+            <Route exact path="/register" component={Register} />
+            <Route exact path="/login" component={Login} />
+          </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
-    </Router>
+      </Router>
+    </Provider>
   );
 }
 
