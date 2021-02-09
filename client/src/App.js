@@ -2,7 +2,7 @@ import "./App.css";
 import Footer from "./components/Footer";
 import Landing from "./components/Landing";
 import Navbar from "./components/Navbar";
-import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import { Provider } from "react-redux";
