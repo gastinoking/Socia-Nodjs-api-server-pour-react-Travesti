@@ -19,6 +19,13 @@ class Register extends Component {
     this.onChangeinput = this.onChangeinput.bind(this);
     this.onFormSubmit = this.onFormSubmit.bind(this);
   }
+
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push("/dashboad");
+    }
+  }
+
   static getDerivedStateFromProps(props, stat) {
     if (props.errors) {
       return {
@@ -27,8 +34,6 @@ class Register extends Component {
     }
   }
   onChangeinput(e) {
-    console.log(e.target.name);
-    console.log([e.target.name]);
     this.setState({ [e.target.name]: e.target.value });
   }
   onFormSubmit(e) {

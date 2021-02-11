@@ -44,3 +44,13 @@ export const setCurrentUser = (decode) => {
     payload: decode,
   };
 };
+
+//Déconnecter k'utilisateur
+export const logoutUser = () => (dispatch) => {
+  //Supprimer le localstorage
+  window.localStorage.removeItem("jwtToken");
+  //Supprimer les infos du header
+  setAuthToken(false);
+  //supprimer les info de l'utilisateur
+  dispatch(setCurrentUser({}));
+};
