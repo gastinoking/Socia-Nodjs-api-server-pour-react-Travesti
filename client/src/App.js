@@ -6,10 +6,13 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
+import Dashboard from "./components/dashboard/Dashboard";
+
 import { Provider } from "react-redux";
 import store from "./Redux/store";
 import setAuthToken from "./utils/setAuthToken";
 import { logoutUser, setCurrentUser } from "./Redux/actions/authActions";
+import { clearCurrentProfile } from "./Redux/actions/profileActions";
 if (window.localStorage.getItem("jwtToken")) {
   //Récupérer le token
   const token = window.localStorage.getItem("jwtToken");
@@ -22,6 +25,8 @@ if (window.localStorage.getItem("jwtToken")) {
   if (decoded.exp < currentTime) {
     // logoutUser
     store.dispatch(logoutUser());
+    // CLEAR PROFILE
+    store.dispatch(clearCurrentProfile());
     // redirect user
     window.location.href = "/login";
   }
@@ -36,6 +41,7 @@ function App() {
           <div className="container" style={{ height: "100vh" }}>
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
+            <Route exact path="/dashboard" component={Dashboard} />
           </div>
           <Footer />
         </div>
